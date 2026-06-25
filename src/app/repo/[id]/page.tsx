@@ -77,7 +77,7 @@ export default function RepoDetailPage() {
             </Link>
           </div>
 
-          {/* GitHub Info Card */}
+          {/* Info Card */}
           <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="flex items-start gap-4">
               {repo.avatar_url ? (
@@ -123,7 +123,7 @@ export default function RepoDetailPage() {
                     className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    Buka di GitHub
+                    Buka link
                   </a>
                 </div>
               </div>

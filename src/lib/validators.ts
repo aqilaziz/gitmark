@@ -1,23 +1,11 @@
 import { z } from "zod";
 
 export const repoUrlSchema = z.object({
-  url: z
-    .string()
-    .url("URL tidak valid")
-    .refine(
-      (url) => /github\.com\/[^\/]+\/[^\/\?#]+/.test(url),
-      "Harus berupa URL repository GitHub yang valid",
-    ),
+  url: z.string().url("URL tidak valid"),
 });
 
 export const createRepoSchema = z.object({
-  url: z
-    .string()
-    .url("URL tidak valid")
-    .refine(
-      (url) => /github\.com\/[^\/]+\/[^\/\?#]+/.test(url),
-      "Harus berupa URL repository GitHub yang valid",
-    ),
+  url: z.string().url("URL tidak valid"),
   custom_title: z.string().max(200).optional().nullable(),
   description: z.string().max(2000).optional().nullable(),
   category_ids: z.array(z.string().uuid()).optional(),

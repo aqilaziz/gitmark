@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { createRepoSchema } from "@/lib/validators";
-import { parseGitHubUrl } from "@/lib/utils";
+import { parseGitHubUrl, isGitHubUrl, extractNameFromUrl } from "@/lib/utils";
 import { fetchRepoMetadata } from "@/lib/github";
 
 // GET /api/repos - List semua repo user
@@ -114,16 +114,18 @@ export async function POST(request: NextRequest) {
     const { url, custom_title, description, category_ids, is_favorite } =
       validation.data;
 
-    // Parse GitHub URL
-    const parsed = parseGitHubUrl(url);
-    if (!parsed) {
-      return NextResponse.json(
-        { error: "URL GitHub tidak valid" },
-        { status: 400 },
-      );
-    }
+    // Determine name & metadata based on URL type
+    const isGh = isGitHubUrl(url);
+    const parsed = isGh ? parseGitHubUrl(url) : null;
+    const repoName = parsed
+      ? `${parsed.owner}/${parsed.repo}`
+      : extractNameFromUrl(url);
 
-    const repoName = `${parsed.owner}/${parsed.repo}`;
+    // Fetch GitHub metadata only for GitHub URLs
+    let metadata = null;
+    if (parsed) {
+      metadata = await fetchRepoMetadata(parsed.owner, parsed.repo);
+    }
 
     // Check for duplicate
     const { data: existing } = await supabase
@@ -135,13 +137,10 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: "Repository sudah ada di koleksi Anda" },
+        { error: "Link sudah ada di koleksi Anda" },
         { status: 409 },
       );
     }
-
-    // Fetch metadata from GitHub API
-    const metadata = await fetchRepoMetadata(parsed.owner, parsed.repo);
 
     // Insert repo
     const { data: repo, error: repoError } = await supabase

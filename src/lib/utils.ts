@@ -13,6 +13,27 @@ export function parseGitHubUrl(
   return { owner: match[1], repo: match[2].replace(/\.git$/, "") };
 }
 
+export function isGitHubUrl(url: string): boolean {
+  return /github\.com\/[^\/]+\/[^\/\?#]+/.test(url);
+}
+
+export function extractNameFromUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.replace(/^www\./, "");
+    const path = parsed.pathname.replace(/\/+$/, "");
+    if (path && path !== "/") {
+      // Ambil 2 segment terakhir dari path
+      const segments = path.split("/").filter(Boolean);
+      const lastTwo = segments.slice(-2).join("/");
+      return `${hostname}/${lastTwo}`;
+    }
+    return hostname;
+  } catch {
+    return url.slice(0, 50);
+  }
+}
+
 export function formatStars(count: number | null): string {
   if (count === null || count === undefined) return "0";
   if (count >= 1000) {

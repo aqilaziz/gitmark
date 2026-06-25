@@ -150,7 +150,7 @@ export default function RepoCard({ repo }: RepoCardProps) {
         className="mt-3 inline-flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-600 transition-colors"
       >
         <ExternalLink className="h-3 w-3" />
-        Buka di GitHub
+        Buka link
       </a>
     </div>
   );

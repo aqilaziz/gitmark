@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { parseGitHubUrl } from "@/lib/utils";
+import { parseGitHubUrl, isGitHubUrl } from "@/lib/utils";
 import { useCreateRepo, useUpdateRepo } from "@/hooks/useRepos";
 import CategoryPicker from "./CategoryPicker";
 import { RepoWithCategories, GitHubMetadata } from "@/types";
@@ -40,7 +40,7 @@ export default function RepoForm({
   const [fetchingMeta, setFetchingMeta] = useState(false);
   const [urlError, setUrlError] = useState("");
 
-  // Auto-fetch metadata when URL changes (create mode only)
+  // Auto-fetch metadata when URL changes (create mode only, GitHub only)
   useEffect(() => {
     if (mode !== "create" || !url) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -48,11 +48,18 @@ export default function RepoForm({
       return;
     }
 
+    // Only fetch metadata for GitHub URLs
+    if (!isGitHubUrl(url)) {
+      setUrlError("");
+      setMetadata(null);
+      return;
+    }
+
     const parsed = parseGitHubUrl(url);
     if (!parsed) {
-      if (url.includes("github.com")) {
-        setUrlError("Format URL tidak valid. Gunakan: github.com/owner/repo");
-      }
+      setUrlError(
+        "Format URL GitHub tidak valid. Gunakan: github.com/owner/repo",
+      );
       setMetadata(null);
       return;
     }
@@ -92,11 +99,13 @@ export default function RepoForm({
 
     if (mode === "create") {
       if (!url) {
-        setUrlError("URL repository wajib diisi");
+        setUrlError("URL wajib diisi");
         return;
       }
-      const parsed = parseGitHubUrl(url);
-      if (!parsed) {
+      // Validasi URL umum
+      try {
+        new URL(url);
+      } catch {
         setUrlError("Format URL tidak valid");
         return;
       }
@@ -142,7 +151,7 @@ export default function RepoForm({
             htmlFor="url"
             className="block text-sm font-medium text-gray-700"
           >
-            URL Repository GitHub
+            URL Link
           </label>
           <div className="relative mt-1">
             <input
@@ -150,7 +159,7 @@ export default function RepoForm({
               id="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://github.com/owner/repo"
+              placeholder="https://contoh.com/atau/github.com/owner/repo"
               className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               autoFocus
             />

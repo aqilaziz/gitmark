@@ -108,7 +108,7 @@ export default function RepoListItem({ repo }: RepoListItemProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="rounded p-1.5 text-gray-400 hover:text-indigo-600 transition-colors"
-          title="Buka di GitHub"
+          title="Buka link"
         >
           <ExternalLink className="h-4 w-4" />
         </a>
