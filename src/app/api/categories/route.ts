@@ -24,7 +24,7 @@ export async function GET() {
       console.error("Error fetching categories:", error);
       return NextResponse.json(
         { error: "Gagal mengambil data kategori" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -33,7 +33,7 @@ export async function GET() {
     console.error("Error in GET /api/categories:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { error: "Data tidak valid", details: validation.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: "Kategori dengan nama tersebut sudah ada" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       console.error("Error creating category:", error);
       return NextResponse.json(
         { error: "Gagal membuat kategori" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in POST /api/categories:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

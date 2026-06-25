@@ -63,16 +63,19 @@ export async function GET(request: NextRequest) {
     // Filter by category if specified
     let filteredData = data;
     if (category) {
-      filteredData = data?.filter((repo: any) =>
-        repo.categories?.some((rc: any) => rc.category?.name === category),
+      filteredData = data?.filter((repo: Record<string, unknown>) =>
+        (repo.categories as Array<Record<string, unknown>>)?.some(
+          (rc: Record<string, unknown>) =>
+            (rc.category as Record<string, unknown>)?.name === category,
+        ),
       );
     }
 
     // Transform data to flatten categories
-    const repos = filteredData?.map((repo: any) => ({
+    const repos = filteredData?.map((repo: Record<string, unknown>) => ({
       ...repo,
-      categories: repo.categories
-        ?.map((rc: any) => rc.category)
+      categories: (repo.categories as Array<Record<string, unknown>>)
+        ?.map((rc: Record<string, unknown>) => rc.category)
         .filter(Boolean),
     }));
 
@@ -200,10 +203,18 @@ export async function POST(request: NextRequest) {
     const result = fullRepo
       ? {
           ...fullRepo,
-          categories:
-            (fullRepo as any).categories
-              ?.map((rc: any) => rc.category)
-              .filter(Boolean) || [],
+          categories: (fullRepo as Record<string, unknown>).categories
+            ? (
+                (fullRepo as Record<string, unknown>).categories as Array<
+                  Record<string, unknown>
+                >
+              )
+                .map(
+                  (rc: Record<string, unknown>) =>
+                    (rc as Record<string, unknown>).category,
+                )
+                .filter(Boolean)
+            : [],
         }
       : repo;
 

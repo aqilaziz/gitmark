@@ -5,7 +5,7 @@ import { updateCategorySchema } from "@/lib/validators";
 // PATCH /api/categories/[id] - Edit kategori
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createClient();
@@ -24,7 +24,7 @@ export async function PATCH(
     if (!validation.success) {
       return NextResponse.json(
         { error: "Data tidak valid", details: validation.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function PATCH(
     if (!existing) {
       return NextResponse.json(
         { error: "Kategori tidak ditemukan" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -54,7 +54,7 @@ export async function PATCH(
       console.error("Error updating category:", error);
       return NextResponse.json(
         { error: "Gagal mengupdate kategori" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -63,7 +63,7 @@ export async function PATCH(
     console.error("Error in PATCH /api/categories/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -71,7 +71,7 @@ export async function PATCH(
 // DELETE /api/categories/[id] - Hapus kategori
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const supabase = await createClient();
@@ -96,7 +96,7 @@ export async function DELETE(
       console.error("Error deleting category:", error);
       return NextResponse.json(
         { error: "Gagal menghapus kategori" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -105,7 +105,7 @@ export async function DELETE(
     console.error("Error in DELETE /api/categories/[id]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

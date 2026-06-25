@@ -42,9 +42,18 @@ export async function GET(
 
     const repo = {
       ...data,
-      categories: (data as any).categories
-        ?.map((rc: any) => rc.category)
-        .filter(Boolean),
+      categories: (data as Record<string, unknown>).categories
+        ? (
+            (data as Record<string, unknown>).categories as Array<
+              Record<string, unknown>
+            >
+          )
+            .map(
+              (rc: Record<string, unknown>) =>
+                (rc as Record<string, unknown>).category,
+            )
+            .filter(Boolean)
+        : [],
     };
 
     return NextResponse.json(repo);
@@ -156,10 +165,18 @@ export async function PATCH(
     const result = updatedRepo
       ? {
           ...updatedRepo,
-          categories:
-            (updatedRepo as any).categories
-              ?.map((rc: any) => rc.category)
-              .filter(Boolean) || [],
+          categories: (updatedRepo as Record<string, unknown>).categories
+            ? (
+                (updatedRepo as Record<string, unknown>).categories as Array<
+                  Record<string, unknown>
+                >
+              )
+                .map(
+                  (rc: Record<string, unknown>) =>
+                    (rc as Record<string, unknown>).category,
+                )
+                .filter(Boolean)
+            : [],
         }
       : null;
 

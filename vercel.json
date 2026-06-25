@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://sebysbbtmlmapufocmuq.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNlYnlzYmJ0bWxtYXB1Zm9jbXVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzODY1NDYsImV4cCI6MjA5Nzk2MjU0Nn0.a5_UOPNsNV0zRVrqPWwaP0JifOJA739Vkvb-8Jd7f9w"
+  }
+}

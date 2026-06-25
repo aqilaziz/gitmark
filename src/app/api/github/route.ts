@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       if (!parsed) {
         return NextResponse.json(
           { error: "URL GitHub tidak valid" },
-          { status: 400 }
+          { status: 400 },
         );
       }
       owner = parsed.owner;
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (!owner || !repo) {
       return NextResponse.json(
         { error: "Owner dan repo diperlukan" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!metadata) {
       return NextResponse.json(
         { error: "Gagal mengambil metadata dari GitHub" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     console.error("Error in POST /api/github:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,63 +1,138 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useRepos } from "@/hooks/useRepos";
+import { useCategories } from "@/hooks/useCategories";
+import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
+import SearchBar from "@/components/SearchBar";
+import ViewToggle from "@/components/ViewToggle";
+import RepoGrid from "@/components/RepoGrid";
+import RepoList from "@/components/RepoList";
+import EmptyState from "@/components/EmptyState";
+import { ViewMode } from "@/types";
+import { Loader2 } from "lucide-react";
+
+export default function DashboardPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("gitmark-view-mode") as ViewMode;
+      return saved || "grid";
+    }
+    return "grid";
+  });
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/auth/login");
+        return;
+      }
+      setUser(user);
+      setLoading(false);
+    };
+    getUser();
+  }, [supabase.auth, router]);
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem("gitmark-view-mode", mode);
+  };
+
+  const queryParams = {
+    search: search || undefined,
+    category: selectedCategory || undefined,
+    favorite: showFavorites || undefined,
+  };
+
+  const { data: repos = [], isLoading: reposLoading } = useRepos(queryParams);
+  const { data: categories = [] } = useCategories();
+
+  const handleSelectCategory = useCallback((name: string | null) => {
+    setSelectedCategory(name);
+    setShowFavorites(false);
+  }, []);
+
+  const handleToggleFavorites = useCallback(() => {
+    setShowFavorites((prev) => !prev);
+    setSelectedCategory(null);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="flex min-h-screen flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Selamat datang, {user?.user_metadata?.user_name || user?.email} 👋
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Kelola koleksi repository GitHub kamu
+            </p>
+          </div>
+
+          {/* Search & View Toggle */}
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex-1 max-w-md">
+              <SearchBar value={search} onChange={setSearch} />
+            </div>
+            <ViewToggle mode={viewMode} onChange={handleViewModeChange} />
+          </div>
+
+          {/* Content */}
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Sidebar */}
+            <Sidebar
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleSelectCategory}
+              showFavorites={showFavorites}
+              onToggleFavorites={handleToggleFavorites}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+            {/* Main content */}
+            <div className="flex-1 min-w-0">
+              {reposLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+                </div>
+              ) : repos.length === 0 ? (
+                <EmptyState
+                  type={
+                    search ? "search" : selectedCategory ? "category" : "repos"
+                  }
+                />
+              ) : viewMode === "grid" ? (
+                <RepoGrid repos={repos} />
+              ) : (
+                <RepoList repos={repos} />
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </div>
