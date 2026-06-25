@@ -106,7 +106,9 @@ export default function LoginPage() {
               ) : (
                 <GithubIcon className="h-5 w-5" />
               )}
-              {loading === "github" ? "Menghubungkan..." : "Masuk dengan GitHub"}
+              {loading === "github"
+                ? "Menghubungkan..."
+                : "Masuk dengan GitHub"}
             </button>
 
             <div className="relative">
@@ -128,7 +130,9 @@ export default function LoginPage() {
               ) : (
                 <GoogleIcon className="h-5 w-5" />
               )}
-              {loading === "google" ? "Menghubungkan..." : "Masuk dengan Google"}
+              {loading === "google"
+                ? "Menghubungkan..."
+                : "Masuk dengan Google"}
             </button>
           </div>
 
